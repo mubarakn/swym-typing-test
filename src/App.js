@@ -12,9 +12,16 @@ function App() {
   const [word, setWord] = useState('')
 
   useEffect(() => {
-    window.addEventListener('keydown', event => {
+    const listener = event => {
+      if(event.key.length === 1 || event.key === 'Tab' || event.key === 'Backspace') {
+        event.preventDefault()
+      }
       console.log(event)
-    })
+    }
+    window.addEventListener('keydown', listener)
+    return () => {
+      window.addEventListener('keydown', listener)
+    }
   }, [])
 
   useEffect(() => {
