@@ -37,7 +37,7 @@ const StartScreen = ({ time, setTime, onStart}) => {
                     />
             </div>
             <button
-                className="transition px-4 py-1 mt-10 bg-emerald-500 hover:bg-emerald-400 shadow-md shadow-emerald-500/75 text-white rounded-lg disabled:bg-gray-500 disabled:shadow-none"
+                className="transition px-4 py-1 mt-10 bg-emerald-500 hover:bg-emerald-400 shadow-md shadow-emerald-500/75 text-white rounded-lg disabled:bg-gray-500 disabled:shadow-none disabled:opacity-50"
                 onClick={() => typeof onStart === 'function' && onStart()}
                 disabled={!level || !time}
                 >

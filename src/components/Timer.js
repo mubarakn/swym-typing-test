@@ -46,7 +46,7 @@ const Timer = forwardRef(({ seconds, onExpired }, ref) => {
     var m = Math.floor(d % 3600 / 60);
     var s = Math.floor(d % 3600 % 60);
     return (
-        <div className='text-2xl'>
+        <div className='text-2xl font-semibold'>
             {`${h > 0 ? `${h < 10 ? '0' : ''}${h}:`: '' }${`${m < 10 ? '0' : ''}${m}:`}${`${s < 10 ? '0' : ''}${s}`}`}
         </div>
     )

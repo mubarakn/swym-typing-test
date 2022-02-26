@@ -29,7 +29,7 @@ function App() {
   
   return (
     <div className="w-full h-full flex items-center justify-center bg-gray-100">
-      <div className="w-full h-[50vh] md:w-3/4 lg:w-4/5 xl:w-3/5 bg-white shadow rounded overflow-hidden flex overflow-hidden">
+      <div className="w-full h-[60vh] md:w-3/4 lg:w-5/6 xl:w-4/5 bg-white shadow rounded overflow-hidden flex overflow-hidden">
         <div
           className={`flex w-full h-full transition`}
           style={{ transform: `translateX(-${100 * slideIndex}%)`}}

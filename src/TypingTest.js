@@ -49,9 +49,9 @@ const TypingTest = ({ time, onDone }) => {
                     if(typeof onDone === 'function') onDone(spentSeconds)
                 } } />
 
-                <button className='ml-auto' onClick={() => timerRef.current.stop()}>close</button>
+                <button className='ml-auto border border-transparent hover:border-gray-600 px-4 py-1 rounded-lg' onClick={() => timerRef.current.stop()}>close</button>
             </div>
-            <div className='w-full overflow-hidden text-3xl h-[30rem] p-6'>
+            <div className='w-full flex-1 overflow-hidden text-3xl p-6'>
                 {lines.map((line, lineIndex) => {
                     return (
                         <div key={`line-${lineIndex}`}>
@@ -70,7 +70,7 @@ const TypingTest = ({ time, onDone }) => {
                                     .reduce((prev, curr) => {
                                         return [prev, ' ', curr]
                                     })}</p>
-                            <p className='whitespace-nowrap border-b h-10' id={lineIndex === wordPosition.lineIndex ? 'currentLine' : undefined }>
+                            <p className='whitespace-nowrap border-b h-10 text-gray-500' id={lineIndex === wordPosition.lineIndex ? 'currentLine' : undefined }>
                                 {typedLines[lineIndex] && (
                                     typedLines[lineIndex]
                                     .map((word, wordIdx) => {
