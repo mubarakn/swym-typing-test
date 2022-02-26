@@ -10,6 +10,7 @@ const StartScreen = ({ time, setTime, onStart}) => {
 
     return (
         <div className="w-full shrink-0 bg-white flex flex-col items-center justify-center">
+            <h1 className="text-3xl text-gray-600 mb-10">Typing Test App</h1>
             <div>
                 <label className="block text-xl text-center text-gray-600">Select Difficulty</label>
                 <ToggleButtons
