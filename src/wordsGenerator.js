@@ -4,7 +4,7 @@ const easyWordFuncs = [faker.word.verb, faker.word.adjective, faker.word.verb, f
 const mediumWordFuncs = [faker.hacker.phrase, faker.word.noun, faker.company.companyName, faker.commerce.product, faker.animal.cat, faker.address.cardinalDirection, faker.address.streetAddress]
 const hardWordFuncs = [faker.vehicle.vehicle, faker.music.genre, faker.database.engine, faker.hacker.phrase, faker.word.noun, faker.commerce.product]
 
-const generator = (level, wordsCount = 300) => {
+const generator = (level, wordsCount = 500) => {
     let generatorArray;
     switch (level) {
         case 'Medium':
