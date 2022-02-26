@@ -55,26 +55,28 @@ const ResultScreen = ({ spentSeconds, onPlayAgain }) => {
         }
         const resultData = JSON.parse(results)
         return (
-            <table className='table-auto border border-gray-200'>
-                <thead className='bg-gray-50 border-b border-gray-200'>
-                    <tr>
-                        <th className='p-1'>Date</th>
-                        <th className='p-1'>Score</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {resultData.map((data, dIdx) => {
-                        const key = Object.keys(data)[0]
-                        return (
-                            <tr key={`${key}-${dIdx}`} className='odd:bg-white even:bg-gray-100'>
-                                <td className='p-1 border-r border-gray-200'>{dayjs(key).format(dayjs().isSame(dayjs(key), 'day') ? 'hh:mma' : 'DD-MM-YYYY hh:mma')}</td>
-                                <td className='p-1'>{data[key]}</td>
-                            </tr>
-                        )
-                    })}
-                    
-                </tbody>
-            </table>
+            <div className='h-full overflow-y-auto flex items-start justify-center'>
+                <table className='table-auto border border-gray-200'>
+                    <thead className='bg-gray-50 border-b border-gray-200'>
+                        <tr>
+                            <th className='p-1 w-24 border-r border-gray-200'>Date</th>
+                            <th className='p-1 w-24 text-center'>Score</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {resultData.map((data, dIdx) => {
+                            const key = Object.keys(data)[0]
+                            return (
+                                <tr key={`${key}-${dIdx}`} className='odd:bg-white even:bg-gray-100'>
+                                    <td className='p-1 w-24 border-r border-gray-200'>{dayjs(key).format(dayjs().isSame(dayjs(key), 'day') ? 'hh:mma' : 'DD-MM-YYYY hh:mma')}</td>
+                                    <td className='p-1 text-right w-24'>{data[key]}</td>
+                                </tr>
+                            )
+                        })}
+                        
+                    </tbody>
+                </table>
+            </div>
         )
     }
 
@@ -101,11 +103,11 @@ const ResultScreen = ({ spentSeconds, onPlayAgain }) => {
         })
 
         return (
-            <div className='h-full overflow-y-auto'>
+            <div className='h-full overflow-y-auto flex items-start justify-center'>
                 <table className='table-auto border border-gray-200'>
                     <thead className='bg-gray-50 border-b border-gray-200'>
                         <tr>
-                            <th className='p-1'>Key</th>
+                            <th className='p-1 border-r border-gray-200'>Key</th>
                             <th className='p-1'>Missed</th>
                         </tr>
                     </thead>
@@ -115,8 +117,8 @@ const ResultScreen = ({ spentSeconds, onPlayAgain }) => {
                         }).map((key, kIdx) => {
                             return (
                                 <tr key={`key-${kIdx}`} className='odd:bg-white even:bg-gray-100'>
-                                    <td className='p-1 border-r border-gray-200'>{key}</td>
-                                    <td className='p-1 text-right'>{keys[key]}</td>
+                                    <td className='p-1 w-24 text-center border-r border-gray-200'>{key}</td>
+                                    <td className='p-1 w-24 text-right'>{keys[key]}</td>
                                 </tr>
                             )
                         })}
@@ -127,11 +129,8 @@ const ResultScreen = ({ spentSeconds, onPlayAgain }) => {
     }
 
     return (
-        <div className="w-full shrink-0 bg-white flex p-10">
-            <div>
-                <h1 className='text-center font-semibold mb-2'>Last Scores</h1>
-                {fetchLastScores()}
-            </div>
+        <div className="w-full shrink-0 bg-white flex p-10 justify-center">
+            
             <div className='flex-1 flex flex-col items-center'>
                 <h1 className='mb-14 text-2xl text-gray-600'>Result</h1>
                 <div className='flex'>
@@ -161,9 +160,15 @@ const ResultScreen = ({ spentSeconds, onPlayAgain }) => {
                     Play Again
                 </button>
             </div>
-            <div>
-                <h1 className='text-center font-semibold mb-2'>Tricky keys</h1>
-                {analyzeTrickyKeys()}
+            <div className='flex-1 justify-center flex'>
+                <div className='w-fit ml-10'>
+                    <h1 className='text-center font-semibold mb-2'>Last Scores</h1>
+                    {fetchLastScores()}
+                </div>
+                <div className='w-fit ml-10'>
+                    <h1 className='text-center font-semibold mb-2'>Tricky keys</h1>
+                    {analyzeTrickyKeys()}
+                </div>
             </div>
         </div>
     )
