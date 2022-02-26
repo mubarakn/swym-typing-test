@@ -1,58 +1,46 @@
-import { useEffect, useState } from 'react'
-import faker from "@faker-js/faker"
-import Master from "./components/Master";
-
-const easyWordFuncs = [faker.word.verb, faker.word.noun, faker.word.conjunction, faker.word.adjective, faker.name.firstName, faker.animal.type]
-const mediumWordFuncs = [faker.hacker.phrase, faker.word.noun, faker.company.companyName, faker.commerce.product, faker.animal.cat, faker.address.cardinalDirection, faker.address.streetAddress]
-const hardWordFuncs = [faker.vehicle.vehicle, faker.music.genre, faker.database.engine, faker.hacker.phrase, faker.word.noun, faker.commerce.product, faker.phone.phoneNumber]
+import { useState } from "react";
+import ResultScreen from "./components/ResultScreen";
+import StartScreen from "./components/StartScreen";
+import TypingTest from "./TypingTest";
 
 function App() {
-  const [level, setLevel] = useState('hard') //easy, medium, hard
-  const [words, setWords] = useState([])
-  const [word, setWord] = useState('')
+  const [time, setTime] = useState(0)
+  const [slideIndex, setSlideIndex] = useState(0)
+  const [spentSeconds, setSpentSeconds] = useState(0)
 
-  useEffect(() => {
-    const listener = event => {
-      if(event.key.length === 1 || event.key === 'Tab' || event.key === 'Backspace') {
-        event.preventDefault()
-      }
-      console.log(event)
-    }
-    window.addEventListener('keydown', listener)
-    return () => {
-      window.addEventListener('keydown', listener)
-    }
-  }, [])
+  const handleStart = () => {
+    setSlideIndex(1)
+  }
 
-  useEffect(() => {
-    let generatorArray;
-    switch (level) {
-      case 'medium':
-        generatorArray = mediumWordFuncs
-        break;
-      case 'hard':
-        generatorArray = hardWordFuncs
-        break;
-      default:
-        generatorArray = easyWordFuncs
-        break;
-    }
+  const handleDone = (spentSeconds) => {
+    setSpentSeconds(spentSeconds)
+    setSlideIndex(2)
+  }
 
-    const generatedWords = []
-    while (generatedWords.length < 300) {
-      const generatorIndex = Math.floor(Math.random() * generatorArray.length)
-      const generatorFunc = generatorArray[generatorIndex]
-      generatedWords.push(...generatorFunc().split(' ').filter(a => a.length >= 3))
-    }
-    setWords(generatedWords)
-  }, [level])
+  const handleTime = seconds => {
+    setTime(seconds)
+  }
 
+  const handlePlayAgain = () => {
+    setSpentSeconds(0)
+    setTime(0)
+    setSlideIndex(0)
+  }
+  
   return (
-    <Master>
-      <h1>{word}</h1>
-      <button onClick={() => { setWord(faker.word.adjective())}}>Generate</button>
-    </Master>
-  );
+    <div className="w-full h-full flex items-center justify-center bg-gray-100">
+      <div className="w-full h-[50vh] md:w-3/4 lg:w-4/5 xl:w-3/5 bg-white shadow rounded overflow-hidden flex overflow-hidden">
+        <div
+          className={`flex w-full h-full transition`}
+          style={{ transform: `translateX(-${100 * slideIndex}%)`}}
+          >
+          <StartScreen time={time} setTime={handleTime} onStart={handleStart} />
+          <TypingTest time={time} onDone={handleDone} />
+          <ResultScreen spentSeconds={spentSeconds} onPlayAgain={handlePlayAgain} />
+        </div>
+      </div>
+    </div>
+  )
 }
 
 export default App;
