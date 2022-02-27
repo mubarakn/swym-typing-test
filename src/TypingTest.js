@@ -43,7 +43,7 @@ const TypingTest = ({ time, onDone }) => {
     }, [])
 
     return (
-        <div className='w-full shrink-0 flex flex-col items-center'>
+        <div className='w-full shrink-0 flex flex-col items-center p-6'>
             <div className='flex w-full justify-center items-center p-2'>
                 <Timer ref={timerRef} seconds={time} onExpired={(spentSeconds) => {
                     if(typeof onDone === 'function') onDone(spentSeconds)
@@ -51,11 +51,11 @@ const TypingTest = ({ time, onDone }) => {
 
                 <button className='ml-auto border border-transparent hover:border-gray-600 px-4 py-1 rounded-lg' onClick={() => timerRef.current.stop()}>close</button>
             </div>
-            <div className='w-full flex-1 overflow-hidden text-3xl p-6'>
+            <div className='w-fit flex-1 overflow-hidden text-3xl p-6 self-center'>
                 {lines.map((line, lineIndex) => {
                     return (
                         <div key={`line-${lineIndex}`}>
-                            <p className={`whitespace-nowrap h-14 text-gray-600 mb-4 mt-10`}>
+                            <p className={`whitespace-nowrap h-14 text-gray-600 mb-2 mt-10`}>
                                 {line
                                     .map((word, wordIndex) => {
                                         let isWrongWord = !!score.wrongs[`${lineIndex}-${wordIndex}`]

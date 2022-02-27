@@ -6,6 +6,66 @@ import { reset as scoreReset } from '../reducers/scoreReducer'
 import { reset as typedLinesReset } from '../reducers/typedLinesReducer'
 import { reset as wordPosReset } from '../reducers/wordPosReducer'
 import dayjs from 'dayjs'
+import { Chart } from 'react-chartjs-2'
+import {
+    Chart as ChartJS,
+    CategoryScale,
+    LinearScale,
+    BarElement,
+    Title,
+    Tooltip,
+    Legend,
+  } from 'chart.js';
+
+  ChartJS.register(
+    CategoryScale,
+    LinearScale,
+    BarElement,
+    Title,
+    Tooltip,
+    Legend
+  );
+
+const BarChart = ({labels, values, title}) => {
+
+    const data = {
+        responsive: true,
+        maintainAspectRatio: false,
+        cutoutPercentage: 80,
+        labels: labels,
+        datasets: [{
+            label: title,
+            data: values,
+            backgroundColor: [
+            'rgba(255, 99, 132, 0.2)',
+            'rgba(255, 159, 64, 0.2)',
+            'rgba(255, 205, 86, 0.2)',
+            'rgba(75, 192, 192, 0.2)',
+            'rgba(54, 162, 235, 0.2)',
+            'rgba(153, 102, 255, 0.2)',
+            'rgba(201, 203, 207, 0.2)'
+            ],
+            borderColor: [
+            'rgb(255, 99, 132)',
+            'rgb(255, 159, 64)',
+            'rgb(255, 205, 86)',
+            'rgb(75, 192, 192)',
+            'rgb(54, 162, 235)',
+            'rgb(153, 102, 255)',
+            'rgb(201, 203, 207)'
+            ],
+            borderWidth: 1
+        }]
+        }
+
+    return (
+        <Chart
+            type='bar'
+            data={data}
+            
+            />
+    )
+}
 
 const ResultScreen = ({ spentSeconds, onPlayAgain }) => {
     const dispatch = useDispatch()
@@ -54,29 +114,19 @@ const ResultScreen = ({ spentSeconds, onPlayAgain }) => {
             return 'No data'
         }
         const resultData = JSON.parse(results)
+
+        const labels = []
+        const values = []
+
+        resultData.forEach(d => {
+            const k = Object.keys(d)[0]
+            labels.push(dayjs(k).format('D-M-YY h:m a'))
+            values.push(d[k])
+        })
+        
+
         return (
-            <div className='h-full overflow-y-auto flex items-start justify-center'>
-                <table className='table-auto border border-gray-200'>
-                    <thead className='bg-gray-50 border-b border-gray-200'>
-                        <tr>
-                            <th className='p-1 w-24 border-r border-gray-200'>Date</th>
-                            <th className='p-1 w-24 text-center'>Score</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {resultData.map((data, dIdx) => {
-                            const key = Object.keys(data)[0]
-                            return (
-                                <tr key={`${key}-${dIdx}`} className='odd:bg-white even:bg-gray-100'>
-                                    <td className='p-1 w-24 border-r border-gray-200'>{dayjs(key).format(dayjs().isSame(dayjs(key), 'day') ? 'hh:mma' : 'DD-MM-YYYY hh:mma')}</td>
-                                    <td className='p-1 text-right w-24'>{data[key]}</td>
-                                </tr>
-                            )
-                        })}
-                        
-                    </tbody>
-                </table>
-            </div>
+            <BarChart labels={labels} values={values} title='Last Scores' />
         )
     }
 
@@ -102,29 +152,17 @@ const ResultScreen = ({ spentSeconds, onPlayAgain }) => {
             }
         })
 
+        const labels = []
+        const values = []
+
+        const sortedKeys = Object.keys(keys).sort()
+        sortedKeys.forEach(key => {
+            labels.push(key)
+            values.push(keys[key])
+        });
+
         return (
-            <div className='h-full overflow-y-auto flex items-start justify-center'>
-                <table className='table-auto border border-gray-200'>
-                    <thead className='bg-gray-50 border-b border-gray-200'>
-                        <tr>
-                            <th className='p-1 border-r border-gray-200'>Key</th>
-                            <th className='p-1'>Missed</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {Object.keys(keys).sort((a, b) => {
-                            return keys[b] - keys[a]
-                        }).map((key, kIdx) => {
-                            return (
-                                <tr key={`key-${kIdx}`} className='odd:bg-white even:bg-gray-100'>
-                                    <td className='p-1 w-24 text-center border-r border-gray-200'>{key}</td>
-                                    <td className='p-1 w-24 text-right'>{keys[key]}</td>
-                                </tr>
-                            )
-                        })}
-                    </tbody>
-                </table>
-            </div>
+            <BarChart labels={labels} values={values} title='Tricky Keys' />
         )
     }
 
@@ -160,15 +198,13 @@ const ResultScreen = ({ spentSeconds, onPlayAgain }) => {
                     Play Again
                 </button>
             </div>
-            <div className='flex-1 justify-center flex'>
-                <div className='w-fit ml-10'>
-                    <h1 className='text-center font-semibold mb-2'>Last Scores</h1>
+            <div className='flex-1 pl-10 flex flex-col h-full'>
+                <div className='flex-1 mt-10'>
                     {fetchLastScores()}
                 </div>
-                <div className='w-fit ml-10'>
-                    <h1 className='text-center font-semibold mb-2'>Tricky keys</h1>
+{/*                 <div className='flex-1'>
                     {analyzeTrickyKeys()}
-                </div>
+                </div> */}
             </div>
         </div>
     )
