@@ -6,7 +6,7 @@ import { reset as scoreReset } from '../reducers/scoreReducer'
 import { reset as typedLinesReset } from '../reducers/typedLinesReducer'
 import { reset as wordPosReset } from '../reducers/wordPosReducer'
 import dayjs from 'dayjs'
-import { Chart } from 'react-chartjs-2'
+import { Bar } from 'react-chartjs-2'
 import {
     Chart as ChartJS,
     CategoryScale,
@@ -59,8 +59,7 @@ const BarChart = ({labels, values, title}) => {
         }
 
     return (
-        <Chart
-            type='bar'
+        <Bar
             data={data}
             
             />
