@@ -49,7 +49,7 @@ const TypingTest = ({ time, onDone }) => {
     }, [listener])
 
     return (
-        <div className='h-full w-full flex flex-col items-center relative'>
+        <div className='h-full w-full flex flex-col items-center'>
             <div className='flex w-full justify-center items-center p-2'>
                 <Timer ref={timerRef} seconds={time} onExpired={(spentSeconds) => {
                     setSpentSeconds(spentSeconds)
