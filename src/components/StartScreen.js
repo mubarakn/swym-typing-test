@@ -6,10 +6,10 @@ const StartScreen = ({ time, setTime, onStart}) => {
     const dispatch = useDispatch()
     const { level } = useSelector(state => state)
 
-    const times = { '1 minute': 60, '2 minutes': 120, '3 minutes': 180, '5 minutes': 300 }
+    const times = { '10 Sec': 10, '1 minute': 60, '2 minutes': 120, '3 minutes': 180, '5 minutes': 300 }
 
     return (
-        <div className="w-full shrink-0 bg-white flex flex-col items-center justify-center">
+        <div className="w-full h-full flex flex-col items-center justify-center">
             <h1 className="text-3xl text-gray-600 mb-10">Typing Test App</h1>
             <div>
                 <label className="block text-xl text-center text-gray-600">Select Difficulty</label>

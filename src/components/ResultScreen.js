@@ -61,7 +61,6 @@ const BarChart = ({labels, values, title}) => {
     return (
         <Bar
             data={data}
-            
             />
     )
 }
@@ -127,13 +126,13 @@ const ResultScreen = ({ spentSeconds, onPlayAgain }) => {
             }
             localStorage.setItem('results', JSON.stringify(resultData))
         }
-    }, [spentSeconds])
+    }, [spentSeconds, totalScore])
 
 
     const fetchLastScores = () => {
         const results = localStorage.getItem('results')
         if (!results) {
-            return 'No data'
+            return ''
         }
         const resultData = JSON.parse(results)
 

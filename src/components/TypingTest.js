@@ -1,11 +1,11 @@
 import { useEffect, useRef, useState, useCallback } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
-import wordsGenerator from './wordsGenerator'
-import { loadLines } from './reducers/linesReducer'
+import wordsGenerator from '../wordsGenerator'
+import { loadLines } from '../reducers/linesReducer'
 import { chunk } from 'lodash'
-import { record } from './Recorder'
-import Timer from './components/Timer';
-import Modal from './components/Modal'
+import { record } from '../Recorder'
+import Timer from './Timer';
+import Modal from './Modal'
 
 const TypingTest = ({ time, onDone }) => {
     const timerRef = useRef(null)
@@ -21,7 +21,7 @@ const TypingTest = ({ time, onDone }) => {
         
         toggleEndModal(false)
         setSpentSeconds(0)
-    }, [level])
+    }, [level, dispatch])
 
     useEffect(() => {
         const currentLineElement = document.getElementById('currentLine')
@@ -46,10 +46,10 @@ const TypingTest = ({ time, onDone }) => {
         return () => {
             window.removeEventListener('keydown', listener)
         }
-    }, [])
+    }, [listener])
 
     return (
-        <div className='w-full shrink-0 flex flex-col items-center relative'>
+        <div className='h-full w-full flex flex-col items-center relative'>
             <div className='flex w-full justify-center items-center p-2'>
                 <Timer ref={timerRef} seconds={time} onExpired={(spentSeconds) => {
                     setSpentSeconds(spentSeconds)
