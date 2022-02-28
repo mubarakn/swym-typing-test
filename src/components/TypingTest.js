@@ -7,6 +7,8 @@ import { record } from '../Recorder'
 import Timer from './Timer';
 import Modal from './Modal'
 
+const Caret = () => <span id='caret' className='absolute top-0 left-0 caret inline-block w-[1px] bg-black'></span>
+
 const TypingTest = ({ time, onDone }) => {
     const timerRef = useRef(null)
     const dispatch = useDispatch()
@@ -28,6 +30,17 @@ const TypingTest = ({ time, onDone }) => {
         if (currentLineElement) {
             currentLineElement.scrollIntoView({ behavior: 'smooth', block: 'center' })
         }
+
+        const currentWordElement = document.getElementById('currentWord')
+        if (currentWordElement) {
+            const rect = currentWordElement.getBoundingClientRect()
+            const caretElement = document.getElementById('caret')
+            const x = currentWordElement.innerText.length > 0 ? (rect.width * (wordPosition.cursorPos/currentWordElement.innerText.length)) : 0
+            caretElement.style.left = `${rect.x + x}px`
+            caretElement.style.top = `${rect.y}px`
+            caretElement.style.height = `${rect.height}px`
+        }
+
     }, [currentWord, wordPosition])
 
     const listener = useCallback(event => {
@@ -49,7 +62,7 @@ const TypingTest = ({ time, onDone }) => {
     }, [listener])
 
     return (
-        <div className='h-full w-full flex flex-col items-center'>
+        <div className='h-full w-full flex flex-col items-center font-mono'>
             <div className='flex w-full justify-center items-center p-2'>
                 <Timer ref={timerRef} seconds={time} onExpired={(spentSeconds) => {
                     setSpentSeconds(spentSeconds)
@@ -83,16 +96,11 @@ const TypingTest = ({ time, onDone }) => {
                                     .map((word, wordIdx) => {
                                         const currLineAndWord = lineIndex === wordPosition.lineIndex && wordIdx === wordPosition.wordIndex
                                         return (
-                                            <>
-                                                <span
-                                                    key={`typed-${wordIdx}-${word}`}>
-                                                    {word.split('').map((c, cIdx) => {
-                                                        const currIdx = currLineAndWord && cIdx === wordPosition.cursorPos
-                                                        return currIdx ? <><span className='caret inline-block w-[2px] bg-black'>|</span>{c}</>: c
-                                                    })}
-                                                </span>
-                                                {currLineAndWord && typedLines[wordPosition.lineIndex][wordPosition.wordIndex].length === wordPosition.cursorPos && <span className='caret inline-block w-[2px] bg-black'>|</span>}
-                                            </>
+                                            <span
+                                                key={`typed-${wordIdx}-${word}`}
+                                                id={lineIndex === wordPosition.lineIndex && wordIdx === wordPosition.wordIndex ? 'currentWord' : undefined}>
+                                                {word}
+                                            </span>
                                         )
                                     })
                                     .reduce((prev, curr) => {
@@ -117,6 +125,7 @@ const TypingTest = ({ time, onDone }) => {
                     </div>
                 </Modal>
             )}
+            <Caret />
         </div>
       )
 }

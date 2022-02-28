@@ -1,5 +1,5 @@
 import store from './store'
-import { addLine, editLine, deleteWord, deleteLine } from './reducers/typedLinesReducer'
+import { addLine, editLine, deleteWord, addWord } from './reducers/typedLinesReducer'
 import { setWordPosition } from './reducers/wordPosReducer'
 import { setWord } from './reducers/currentWordReducer'
 import { addCorrect, addWrong, deleteScore } from './reducers/scoreReducer'
@@ -9,10 +9,22 @@ export const record = (key) => {
     const { currentWord, lines, wordPosition, typedLines } = getState()
     const { lineIndex, wordIndex, cursorPos } = wordPosition
 
+    const calculateScore = () => {
+        dispatch(deleteScore(lineIndex, wordIndex))
+        const actualWord = lines[lineIndex][wordIndex]
+        if (typedLines[lineIndex]) {
+            if (actualWord === typedLines[lineIndex][wordIndex]) {
+                dispatch(addCorrect(lineIndex, wordIndex))
+            }
+            else {
+                dispatch(addWrong(lineIndex, wordIndex))
+            }
+        }
+    }
+
     if (key.length === 1) {
         let newWord = ''
         if (key !== ' ') {
-            // newWord = `${currentWord}${key}`
             newWord = currentWord.slice(0, cursorPos)+key+currentWord.slice(cursorPos)
             if (!typedLines[lineIndex]) {
                 dispatch(addLine([newWord]))
@@ -24,20 +36,25 @@ export const record = (key) => {
 
         if (key === ' ') {
             const typedWord = typedLines[lineIndex][wordIndex]
-
-            //For score
-            const actualWord = lines[lineIndex][wordIndex]
-            if (actualWord === typedWord) {
-                dispatch(addCorrect(lineIndex, wordIndex))
-            }
-            else {
-                dispatch(addWrong(lineIndex, wordIndex))
-            }
-
-
             if (typedWord) {
+                const wordsInLine = typedLines[lineIndex].length
+                if (wordIndex < wordsInLine-1 && lines[lineIndex].length === wordsInLine) {
+                    return
+                }
+
+
                 if (wordIndex < lines[lineIndex].length-1) {
+                    const charsAfterIndex = typedLines[lineIndex][wordIndex].slice(cursorPos)
+                    if (!charsAfterIndex) {
+                        dispatch(addWord(lineIndex, wordIndex+1, ''))
+                    }
+                    else {
+                        dispatch(editLine(lineIndex, wordIndex, typedLines[lineIndex][wordIndex].slice(0, cursorPos)))
+                        dispatch(addWord(lineIndex, wordIndex+1, charsAfterIndex))
+                        
+                    }
                     dispatch(setWordPosition(lineIndex, wordIndex+1, 0))
+                    
                 } else {
                     dispatch(setWordPosition(lineIndex+1, 0, 0))
                 }
@@ -48,8 +65,6 @@ export const record = (key) => {
     }
     else if (key === 'Backspace') {
         const strLengthBeforeCursor = typedLines[lineIndex][wordIndex].slice(0, cursorPos).length
-        console.log('hitting', strLengthBeforeCursor)
-
         if (strLengthBeforeCursor) {
             const newWord = currentWord.slice(0, cursorPos-1)+currentWord.slice(cursorPos)
             dispatch(editLine(lineIndex, wordIndex, newWord))
@@ -57,32 +72,27 @@ export const record = (key) => {
             dispatch(setWordPosition(lineIndex, wordIndex, cursorPos-1))
         }
         else if (!strLengthBeforeCursor && wordIndex > 0) {
-            const word = typedLines[lineIndex][wordIndex-1]
+            const leftoverChars = typedLines[lineIndex][wordIndex]
+            const word = typedLines[lineIndex][wordIndex-1]+leftoverChars
+            dispatch(editLine(lineIndex, wordIndex-1, word))
+            dispatch(deleteWord(lineIndex, wordIndex))
             dispatch(setWord(word))
-            dispatch(setWordPosition(lineIndex, wordIndex-1, word.length))
+            dispatch(setWordPosition(lineIndex, wordIndex-1, word.length - leftoverChars.length))
         }
         else {
-            
-        }
-
-        /* const currentPosTypedWord = typedLines[lineIndex] && typedLines[lineIndex][wordIndex] ? typedLines[lineIndex][wordIndex] : null
-        if (!currentPosTypedWord) {
-            dispatch(deleteWord(lineIndex, wordIndex))
-            dispatch(deleteScore(lineIndex, wordIndex))
-            if (wordIndex > 0) {
-                dispatch(setWordPosition(lineIndex, wordIndex-1))
-                dispatch(setWord(typedLines[lineIndex][wordIndex-1]))
-            } else {
-                if(lineIndex > 0) {
-                    dispatch(deleteLine(lineIndex))
-                    dispatch(setWordPosition(lineIndex-1, typedLines[lineIndex-1].length-1))
-                }
+            if (!lineIndex) {
+                return
             }
-        } else {
-            const newCurrentWord = currentPosTypedWord.slice(0, currentPosTypedWord.length-1)
-            dispatch(setWord(newCurrentWord))
-            dispatch(editLine(lineIndex, wordIndex, newCurrentWord))
-        } */
+
+            const newLineIndex = lineIndex-1
+            const newWordIndex = typedLines[newLineIndex].length-1
+            const newCursorPos = typedLines[newLineIndex][newWordIndex].length
+            if (!currentWord) {
+                dispatch(deleteWord(lineIndex, wordIndex))
+            }
+            dispatch(setWordPosition(newLineIndex, newWordIndex, newCursorPos))
+            dispatch(setWord(typedLines[newLineIndex][newWordIndex]))
+        }
     }
     else if (['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown'].includes(key)) {
         switch (key) {
@@ -117,18 +127,34 @@ export const record = (key) => {
                 }
                 else {
                     const newLineIndex = lineIndex < typedLines.length-1 ? lineIndex + 1 : lineIndex
-                    dispatch(setWordPosition(newLineIndex, wordIndex, typedLines[newLineIndex][wordIndex].length))
-                    dispatch(setWord(typedLines[newLineIndex][wordIndex]))
+                    const newWordIndex = typedLines[newLineIndex].length ? typedLines[newLineIndex].length-1 : 0
+                    const tWord = typedLines[newLineIndex][newWordIndex]
+                    dispatch(setWordPosition(newLineIndex, newWordIndex, tWord.length))
+                    dispatch(setWord(typedLines[newLineIndex][newWordIndex]))
                 }
                 break;
             case 'ArrowUp':
-                dispatch(setWordPosition(lineIndex > 0 ? lineIndex-1 : lineIndex, 0, 0))
+                {
+                    const newLine = lineIndex > 0 ? lineIndex-1 : lineIndex
+                    const newWordIndex = Math.min(wordIndex, typedLines[newLine].length ? typedLines[newLine].length-1 : 0)
+                    const newCursorPos = typedLines[newLine][newWordIndex].length-1
+                    dispatch(setWordPosition(newLine, newWordIndex, newCursorPos))
+                    dispatch(setWord(typedLines[newLine][newWordIndex] || ''))
+                }
                 break;
             case 'ArrowDown':
-                dispatch(setWordPosition(lineIndex < typedLines.length-1 ? lineIndex + 1 : lineIndex, 0, 0))
+                {
+                    const newLine = lineIndex < typedLines.length-1 ? lineIndex + 1 : lineIndex
+                    const newWordIndex = Math.min(wordIndex, typedLines[newLine].length ? typedLines[newLine].length-1 : 0)
+                    const newCursorPos = typedLines[newLine][newWordIndex].length-1
+                    dispatch(setWordPosition(newLine, newWordIndex, newCursorPos))
+                    dispatch(setWord(typedLines[newLine][newWordIndex] || ''))
+                }
                 break;
             default:
                 break;
         }
     }
+
+    calculateScore()
 }

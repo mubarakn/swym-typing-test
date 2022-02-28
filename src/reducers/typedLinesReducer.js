@@ -3,6 +3,7 @@ const EDIT_LINE = "EDITLINE"
 const DELETE_WORD = "DELETEWORD"
 const DELETE_LINE = "DELETELINE"
 const RESET = "RESET"
+const ADD_WORD = "ADDWORD"
 
 const initialState = [['']]
 
@@ -43,6 +44,16 @@ const typedLinesReducer = (state = initialState, action) => {
             return newState
         case RESET:
             return initialState
+        case ADD_WORD:
+            {
+                const { lineIndex, wordIndex, word } = action.payload
+                return state.map((line, lineIdx) =>{
+                    if (lineIdx === lineIndex) {
+                        return [...line.slice(0, wordIndex), word, ...line.slice(wordIndex)]
+                    }
+                    return line
+                })
+            }
         default:
             return state
     }
@@ -86,6 +97,17 @@ export const deleteLine = lineIndex => {
 export const reset = () => {
     return {
         type: RESET
+    }
+}
+
+export const addWord = (lineIndex, wordIndex, word) => {
+    return {
+        type: ADD_WORD,
+        payload: {
+            lineIndex,
+            wordIndex,
+            word
+        }
     }
 }
 
