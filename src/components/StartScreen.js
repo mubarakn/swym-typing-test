@@ -6,7 +6,7 @@ const StartScreen = ({ time, setTime, onStart}) => {
     const dispatch = useDispatch()
     const { level } = useSelector(state => state)
 
-    const times = { '1 minute': 60, '2 minutes': 120, '3 minutes': 180, '5 minutes': 300 }
+    const times = { '10 Secs': 10, '1 minute': 60, '2 minutes': 120, '3 minutes': 180, '5 minutes': 300 }
 
     return (
         <div className="w-full shrink-0 bg-white flex flex-col items-center justify-center">

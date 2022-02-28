@@ -66,6 +66,27 @@ const BarChart = ({labels, values, title}) => {
     )
 }
 
+const wordsPerMinute = (lines, spentSeconds, wrongCount) => {
+    const typedWords = lines.flat(1).length - wrongCount
+    if (spentSeconds === 60) {
+        return typedWords
+    }
+    else if (spentSeconds < 60) {
+        return Math.round(typedWords * (60/spentSeconds))
+    }
+    else {
+        return Math.round(typedWords/ (spentSeconds/60))
+    }
+}
+
+const CircleCard = ({ children, bgColor}) => {
+    return (
+        <div className={`ml-10 flex flex-col items-center justify-center rounded-full  w-32 h-32 shadow-lg ${bgColor}`}>
+            {children}
+        </div>
+    )
+}
+
 const ResultScreen = ({ spentSeconds, onPlayAgain }) => {
     const dispatch = useDispatch()
     const { score, lines, typedLines } = useSelector(state => state)
@@ -85,6 +106,8 @@ const ResultScreen = ({ spentSeconds, onPlayAgain }) => {
             onPlayAgain()
         }
     }
+
+    const wpm = wordsPerMinute(typedLines, spentSeconds, Object.keys(wrongs).length)
 
     useEffect(() => {
         if (spentSeconds) {
@@ -170,22 +193,23 @@ const ResultScreen = ({ spentSeconds, onPlayAgain }) => {
             
             <div className='flex-1 flex flex-col items-center'>
                 <h1 className='mb-14 text-2xl text-gray-600'>Result</h1>
-                <div className='flex'>
-                    <div className='flex flex-col items-center justify-center rounded-full bg-emerald-50 w-32 h-32 shadow-lg'>
+                <h2 className=''>Words Per Minute: {wpm} </h2>
+                <div className='flex mt-4'>
+                    <CircleCard bgColor='bg-emerald-50'>
                         <div className='flex items-end'>
                             <h2 className='font-semibold text-5xl text-emerald-500'>{Object.keys(corrects).length}</h2>
                             <span className='text-sm mb-1 ml-1 font-semibold text-emerald-700'> x 10</span>
                         </div>
                         <span className='text-gray-600 text-emerald-500'>Corrects</span>
-                    </div>
+                    </CircleCard>
 
-                    <div className='ml-10 flex flex-col items-center justify-center rounded-full bg-pink-100 w-32 h-32 shadow-lg'>
+                    <CircleCard bgColor='bg-pink-100'>
                         <div className='flex items-end'>
                             <h2 className='font-semibold text-5xl text-pink-500'>{Object.keys(wrongs).length}</h2>
                             <span className='text-sm mb-1 ml-1 font-semibold text-pink-700'> x -5</span>
                         </div>
                         <span className='text-pink-500'>Wrongs</span>
-                    </div>
+                    </CircleCard>
                 </div>
 
                 <h4 className='mt-10 text-3xl text-gray-600'>Your total score is {totalScore}</h4>

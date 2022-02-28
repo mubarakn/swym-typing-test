@@ -1,20 +1,26 @@
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState, useCallback } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import wordsGenerator from './wordsGenerator'
 import { loadLines } from './reducers/linesReducer'
 import { chunk } from 'lodash'
 import { record } from './Recorder'
 import Timer from './components/Timer';
+import Modal from './components/Modal'
 
 const TypingTest = ({ time, onDone }) => {
     const timerRef = useRef(null)
     const dispatch = useDispatch()
     const { lines, level, wordPosition, typedLines, currentWord, score } = useSelector(state => state)
+    const [showEndModal, toggleEndModal] = useState(false)
+    const [spentSeconds, setSpentSeconds] = useState(0)
 
     useEffect(() => {
         const words = wordsGenerator(level)
         const newLines = chunk(words, 7)
         dispatch(loadLines(newLines))
+        
+        toggleEndModal(false)
+        setSpentSeconds(0)
     }, [level])
 
     useEffect(() => {
@@ -24,29 +30,30 @@ const TypingTest = ({ time, onDone }) => {
         }
     }, [currentWord, wordPosition])
 
-    useEffect(() => {
-        const listener = event => {
-            const { key } = event
-            if(key.length === 1 || key === 'Backspace') {
-                event.preventDefault()
-                if (!timerRef.current.isRunning) {
-                    timerRef.current.start()
-                }
-                record(key)
+    const listener = useCallback(event => {
+        const { key } = event
+        if((key.length === 1 || key === 'Backspace') && !showEndModal) {
+            event.preventDefault()
+            if (!timerRef.current.isRunning) {
+                timerRef.current.start()
             }
+            record(key)
         }
-        window.addEventListener('keydown', listener)
+    }, [showEndModal])
 
+    useEffect(() => {
+        window.addEventListener('keydown', listener)
         return () => {
             window.removeEventListener('keydown', listener)
         }
     }, [])
 
     return (
-        <div className='w-full shrink-0 flex flex-col items-center p-6'>
+        <div className='w-full shrink-0 flex flex-col items-center relative'>
             <div className='flex w-full justify-center items-center p-2'>
                 <Timer ref={timerRef} seconds={time} onExpired={(spentSeconds) => {
-                    if(typeof onDone === 'function') onDone(spentSeconds)
+                    setSpentSeconds(spentSeconds)
+                    toggleEndModal(true)
                 } } />
 
                 <button className='ml-auto border border-transparent hover:border-gray-600 px-4 py-1 rounded-lg' onClick={() => timerRef.current.stop()}>close</button>
@@ -91,6 +98,19 @@ const TypingTest = ({ time, onDone }) => {
                     )
                 })}
             </div>
+
+            {showEndModal && (
+                <Modal>
+                    <div className='p-10 w-3/5 bg-white shadow-lg flex flex-col items-center rounded'>
+                        <h2 className='text-3xl text-gray-600'>{spentSeconds === time ? 'Your time is up' : 'You gave up'}!</h2>
+                        <button
+                            className="transition px-4 py-1 mt-10 bg-emerald-500 hover:bg-emerald-400 shadow-md shadow-emerald-500/75 text-white rounded-lg"
+                            onClick={() => {
+                            if(typeof onDone === 'function') onDone(spentSeconds)
+                        }}>View Result</button>
+                    </div>
+                </Modal>
+            )}
         </div>
       )
 }

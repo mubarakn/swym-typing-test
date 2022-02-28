@@ -16,7 +16,9 @@ const Timer = forwardRef(({ seconds, onExpired }, ref) => {
 
         if (started) {
             timerId.current = setTimeout(() => {
-                setRemainingSeconds(remainingSeconds-1)
+                if (remainingSeconds > 0) {
+                    setRemainingSeconds(remainingSeconds-1)
+                }
             }, 1000);
         }
         else {
