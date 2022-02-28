@@ -3,7 +3,8 @@ const RESET = "RESET"
 
 const initialState = {
     lineIndex: 0,
-    wordIndex: 0
+    wordIndex: 0,
+    cursorPos: 0,
 }
 
 const wordPosReducer = (state = initialState, action) => {
@@ -17,12 +18,13 @@ const wordPosReducer = (state = initialState, action) => {
     return state
 }
 
-export const setWordPosition = (lineIndex, wordIndex) => {
+export const setWordPosition = (lineIndex, wordIndex, cursorPos) => {
     return {
         type: SET_POS,
         payload: {
             lineIndex,
-            wordIndex
+            wordIndex,
+            cursorPos
         }
     }
 }

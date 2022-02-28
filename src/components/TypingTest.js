@@ -32,7 +32,7 @@ const TypingTest = ({ time, onDone }) => {
 
     const listener = useCallback(event => {
         const { key } = event
-        if((key.length === 1 || key === 'Backspace') && !showEndModal) {
+        if((key.length === 1 || ['Backspace', 'ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown'].includes(key)) && !showEndModal) {
             event.preventDefault()
             if (!timerRef.current.isRunning) {
                 timerRef.current.start()
@@ -81,18 +81,24 @@ const TypingTest = ({ time, onDone }) => {
                                 {typedLines[lineIndex] && (
                                     typedLines[lineIndex]
                                     .map((word, wordIdx) => {
+                                        const currLineAndWord = lineIndex === wordPosition.lineIndex && wordIdx === wordPosition.wordIndex
                                         return (
-                                            <span
-                                                key={`typed-${wordIdx}-${word}`}>
-                                                {word}
-                                            </span>
+                                            <>
+                                                <span
+                                                    key={`typed-${wordIdx}-${word}`}>
+                                                    {word.split('').map((c, cIdx) => {
+                                                        const currIdx = currLineAndWord && cIdx === wordPosition.cursorPos
+                                                        return currIdx ? <><span className='caret inline-block w-[2px] bg-black'>|</span>{c}</>: c
+                                                    })}
+                                                </span>
+                                                {currLineAndWord && typedLines[wordPosition.lineIndex][wordPosition.wordIndex].length === wordPosition.cursorPos && <span className='caret inline-block w-[2px] bg-black'>|</span>}
+                                            </>
                                         )
                                     })
                                     .reduce((prev, curr) => {
                                         return [prev, ' ', curr]
                                     }, '')
                                 )}
-                                {lineIndex === wordPosition.lineIndex && <span className='caret inline-block w-[2px] bg-black'>|</span>}
                             </p>
                         </div>
                     )

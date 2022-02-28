@@ -4,7 +4,7 @@ const DELETE_WORD = "DELETEWORD"
 const DELETE_LINE = "DELETELINE"
 const RESET = "RESET"
 
-const initialState = [[]]
+const initialState = [['']]
 
 const typedLinesReducer = (state = initialState, action) => {
 
