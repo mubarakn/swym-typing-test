@@ -58,11 +58,7 @@ const BarChart = ({labels, values, title}) => {
         }]
         }
 
-    return (
-        <Bar
-            data={data}
-            />
-    )
+    return <Bar data={data} />
 }
 
 const wordsPerMinute = (lines, spentSeconds, wrongCount) => {
@@ -144,17 +140,14 @@ const ResultScreen = ({ spentSeconds, onPlayAgain }) => {
             labels.push(dayjs(k).format('D-M-YY h:m a'))
             values.push(d[k])
         })
-        
 
-        return (
-            <BarChart labels={labels} values={values} title='Last Scores' />
-        )
+        return <BarChart labels={labels} values={values} title='Last Scores' />
     }
 
     const analyzeTrickyKeys = () => {
         const wrongIndexes = Object.keys(wrongs)
         if(!wrongIndexes.length) {
-            return 'No data'
+            return ''
         }
         const keys = {}
         wrongIndexes.map(indexes => {
@@ -224,7 +217,7 @@ const ResultScreen = ({ spentSeconds, onPlayAgain }) => {
                 <div className='flex-1 mt-10'>
                     {fetchLastScores()}
                 </div>
-                <div className='flex-1'>
+                <div className='flex-1 mt-10'>
                     {analyzeTrickyKeys()}
                 </div>
             </div>
