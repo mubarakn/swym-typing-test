@@ -220,13 +220,13 @@ const ResultScreen = ({ spentSeconds, onPlayAgain }) => {
                     Play Again
                 </button>
             </div>
-            <div className='flex-1 pl-10 flex flex-col h-full'>
+            <div className='flex-1 pl-10 flex flex-col h-screen'>
                 <div className='flex-1 mt-10'>
                     {fetchLastScores()}
                 </div>
-{/*                 <div className='flex-1'>
+                <div className='flex-1'>
                     {analyzeTrickyKeys()}
-                </div> */}
+                </div>
             </div>
         </div>
     )

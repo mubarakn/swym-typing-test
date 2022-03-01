@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, useCallback } from 'react'
+import { useEffect, useRef, useState, useCallback, forwardRef } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import wordsGenerator from '../wordsGenerator'
 import { loadLines } from '../reducers/linesReducer'
@@ -7,9 +7,20 @@ import { record } from '../Recorder'
 import Timer from './Timer';
 import Modal from './Modal'
 
-const Caret = () => <span id='caret' className='absolute top-0 left-0 caret inline-block w-[1px] bg-black'></span>
+const debounce = (func, timeout=300) => {
+    let timerId;
+    return (...props) => {
+        clearTimeout(timerId)
+        timerId = setTimeout(() => {
+            func.apply(this, props)
+        }, timeout);
+    }
+}
+
+const Caret = forwardRef((props, ref) => <span ref={ref} {...props} className='absolute top-0 left-0 caret inline-block w-[2px] bg-black'></span>)
 
 const TypingTest = ({ time, onDone }) => {
+    const caretRef = useRef(null)
     const timerRef = useRef(null)
     const dispatch = useDispatch()
     const { lines, level, wordPosition, typedLines, currentWord, score } = useSelector(state => state)
@@ -25,21 +36,25 @@ const TypingTest = ({ time, onDone }) => {
         setSpentSeconds(0)
     }, [level, dispatch])
 
+    const moveCaret = debounce(() => {
+        const currentWordElement = document.getElementById('currentWord')
+        if (currentWordElement) {
+            const rect = currentWordElement.getBoundingClientRect()
+            const x = currentWordElement.innerText.length > 0 ? (rect.width * (wordPosition.cursorPos/currentWordElement.innerText.length)) : 0
+            caretRef.current.style.left = `${rect.x + x}px`
+            caretRef.current.style.top = `${rect.y}px`
+            caretRef.current.style.height = `${rect.height}px`
+            caretRef.current.style.display = 'block'
+        }
+    })
+
     useEffect(() => {
         const currentLineElement = document.getElementById('currentLine')
         if (currentLineElement) {
             currentLineElement.scrollIntoView({ behavior: 'smooth', block: 'center' })
         }
-
-        const currentWordElement = document.getElementById('currentWord')
-        if (currentWordElement) {
-            const rect = currentWordElement.getBoundingClientRect()
-            const caretElement = document.getElementById('caret')
-            const x = currentWordElement.innerText.length > 0 ? (rect.width * (wordPosition.cursorPos/currentWordElement.innerText.length)) : 0
-            caretElement.style.left = `${rect.x + x}px`
-            caretElement.style.top = `${rect.y}px`
-            caretElement.style.height = `${rect.height}px`
-        }
+        caretRef.current.style.display = 'none'
+        moveCaret()
 
     }, [currentWord, wordPosition])
 
@@ -94,7 +109,6 @@ const TypingTest = ({ time, onDone }) => {
                                 {typedLines[lineIndex] && (
                                     typedLines[lineIndex]
                                     .map((word, wordIdx) => {
-                                        const currLineAndWord = lineIndex === wordPosition.lineIndex && wordIdx === wordPosition.wordIndex
                                         return (
                                             <span
                                                 key={`typed-${wordIdx}-${word}`}
@@ -107,6 +121,7 @@ const TypingTest = ({ time, onDone }) => {
                                         return [prev, ' ', curr]
                                     }, '')
                                 )}
+                                {!document.getElementById('currentWord') && <span className='caret inline-block w-[2px] bg-black'></span>}
                             </p>
                         </div>
                     )
@@ -125,7 +140,7 @@ const TypingTest = ({ time, onDone }) => {
                     </div>
                 </Modal>
             )}
-            <Caret />
+            <Caret ref={caretRef} />
         </div>
       )
 }
